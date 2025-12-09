@@ -242,6 +242,28 @@ class Score:
         screen.blit(self.image, self.rect)
 
 
+class EMP(pg.sprite.Sprite):
+    """
+    発動時に存在する敵機と爆弾を無効化するクラス
+    発動条件：「e」キー押下かつスコアが20より上
+    消費スコア：20
+    """
+    def __init__(self, emys:pg.sprite.Group, bombs:pg.sprite.Group, screen:pg.Surface):
+        super().__init__()
+        self.image=pg.Surface((WIDTH,HEIGHT))
+        pg.draw.rect(self.image,(255,255,0),(0,0,WIDTH,HEIGHT))
+        self.image.set_alpha(150)
+        for enemy in emys:
+            enemy.interval=math.inf
+            enemy.image=pg.transform.laplacian(enemy.image)
+        for bomb in bombs:
+            bomb.speed*=0.5
+            bomb.state="inaactive"
+        screen.blit(self.image,(0,0))
+        pg.display.update()
+        time.sleep(0.05)
+        
+
 def main():
     pg.display.set_caption("真！こうかとん無双")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -253,7 +275,7 @@ def main():
     beams = pg.sprite.Group()
     exps = pg.sprite.Group()
     emys = pg.sprite.Group()
-
+    emps = pg.sprite.Group()
     tmr = 0
     clock = pg.time.Clock()
     while True:
@@ -263,6 +285,9 @@ def main():
                 return 0
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beams.add(Beam(bird))
+            if event.type==pg.KEYDOWN and event.key==pg.K_e and score.value>=20:
+                score.value-=20
+                emps.add(EMP(emys,bombs,screen))
         screen.blit(bg_img, [0, 0])
 
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
@@ -302,6 +327,7 @@ def main():
         pg.display.update()
         tmr += 1
         clock.tick(50)
+        emps.update()
 
 
 if __name__ == "__main__":
