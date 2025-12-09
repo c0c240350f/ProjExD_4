@@ -239,7 +239,7 @@ class Score:
     def __init__(self):
         self.font = pg.font.Font(None, 50)
         self.color = (0, 0, 255)
-        self.value = 0
+        self.value = 10000
         self.image = self.font.render(f"Score: {self.value}", 0, self.color)
         self.rect = self.image.get_rect()
         self.rect.center = 100, HEIGHT-50
@@ -328,16 +328,17 @@ def main():
                 pg.display.update()
                 time.sleep(2)
                 return
-            if len(gravitys)>0:
-                for emy in emys:
-                    exps.add(Explosion(emy,50))  # 爆発エフェクト
-                    emy.kill()
-                for bomb in bombs:
-                    exps.add(Explosion(bomb, 50))  # 爆発エフェクト
-                    bomb.kill()
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
             score.value += 1  # 1点アップ
-        
+    
+        if len(gravitys)>0:
+            for emy in emys:
+                exps.add(Explosion(emy,50))  # 爆発エフェクト
+                emy.kill()
+            for bomb in bombs:
+                exps.add(Explosion(bomb, 50))  # 爆発エフェクト
+                bomb.kill()
+
         if key_lst[pg.K_RSHIFT] and score.value >= 100 and bird.state != "hyper":  # 右SHIFTを押している&スコアが100以上&現在無敵状態ではない
             score.value -= 100  # スコアを100消費
             bird.state = "hyper"  # 現在の状態を無敵状態に変更
